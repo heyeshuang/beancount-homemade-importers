@@ -1,0 +1,27 @@
+#!/usr/bin/env python
+
+import os
+import sys
+
+import beancount.ingest.extract
+from beancount.ingest.importers import csv
+
+beancount.ingest.extract.HEADER = ''
+
+CONFIG = [
+    # BOC Credit
+    csv.Importer(
+        {
+            csv.Col.DATE: '交易日期',
+            csv.Col.NARRATION1: '对方账户名称',
+            # csv.Col.NARRATION2: '附言',
+            csv.Col.AMOUNT_DEBIT: '支出金额',
+            csv.Col.AMOUNT_CREDIT: '收入金额'
+        
+        },
+        account='Assets:Bank:BOC:Card0000',
+        currency='CNY',
+        regexps='网点名称'
+        # categorizer=guess.guess2]
+    )
+]
