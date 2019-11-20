@@ -17,11 +17,21 @@ bean-extract importers/youqian/youqian_income.import documents.tmp/income.csv > 
 
 ## Other importers
 
+[smart_importer](https://github.com/beancount/smart_importer) needs to be installed to import smartly.
+
+```
+pip install smart_importer
+```
+
 ```
 # 微信
-bean-extract importers/wechat.import documents.tmp/test.csv > test.bean 
+bean-extract importers/wechat.import documents.tmp/微信支付账单(xxxxxxxx-xxxxxxxx).csv > test.bean 
 # 中国银行
+# 首先需要将UTF-16转换成UTF-8
 bean-extract importers/boc.import documents.tmp/test.csv > test.bean
 # 招商银行
-bean-extract importers/cmb.import documents.tmp/test.csv > test.bean
+# 数据源：信用卡账单电子邮件
+# 需要在招行网银上将账单邮寄方式改为“电子邮件（含明细）”
+# 然后在邮件客户端上下载“招商银行信用卡电子账单xxx.eml”
+bean-extract importers/cmb.import documents.tmp/招商银行信用卡电子账单xxx.eml > test.bean
 ```

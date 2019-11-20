@@ -5,19 +5,15 @@ import sys
 
 import beancount.ingest.extract
 from smart_importer import apply_hooks, PredictPostings
+from smart_importer.detector import DuplicateDetector
 
 beancount.ingest.extract.HEADER = ''
 sys.path.append("./")
-from importers.wechat import WechatImporter
+from importers.cmb_eml import CmbEmlImporter
 # from importers.wechat import SmartWechatImporter
 
-accountDict={
-    "中国银行":"Assets:Bank:BOC:Card0000",
-    "招商银行":"Liabilities:CreditCards:CMB:Card",
-    "零钱":"Assets:WeChat:Wallet",
-    "/":"Assets:WeChat:Wallet"
-}
 CONFIG = [
-    apply_hooks(WechatImporter(accountDict=accountDict), [PredictPostings()])
+    apply_hooks(CmbEmlImporter(account="Liabilities:CreditCards:CMB:Card"), [
+                DuplicateDetector(), PredictPostings()])
     # SmartWechatImporter(accountDict=accountDict)
 ]

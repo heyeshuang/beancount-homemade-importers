@@ -5,12 +5,14 @@ import sys
 
 import beancount.ingest.extract
 from beancount.ingest.importers import csv
+from smart_importer import PredictPostings, apply_hooks
+from smart_importer.detector import DuplicateDetector
 
 beancount.ingest.extract.HEADER = ''
 
 CONFIG = [
     # BOC Credit
-    csv.Importer(
+    apply_hooks(csv.Importer(
         {
             csv.Col.DATE: '交易日期',
             csv.Col.NARRATION1: '对方账户名称',
@@ -23,5 +25,5 @@ CONFIG = [
         currency='CNY',
         regexps='网点名称'
         # categorizer=guess.guess2]
-    )
+    ), [DuplicateDetector(),PredictPostings()])
 ]
