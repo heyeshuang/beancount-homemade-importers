@@ -37,3 +37,5 @@ bean-extract importers/boc.import documents.tmp/test.csv -f 你的参考账本.b
 bean-extract importers/cmb.import documents.tmp/招商银行信用卡电子账单xxx.eml -f 你的参考账本.bean> test.bean
 
 ```
+
+另外感谢[zsxsoft](https://github.com/zsxsoft/my-beancount-scripts)，不得不说，通过eml文件导入账单真是个好主意。
