@@ -55,9 +55,12 @@ class CmbEmlImporter(importer.ImporterProtocol):
             eml = parser.BytesParser().parse(fp=f)
             b=base64.b64decode(eml.get_payload()[0].get_payload())
             d = BeautifulSoup(b,"lxml")
-            date_range = d.select('#fixBand38 div font')[0].text.strip()
+            date_range = d.findAll(text=re.compile('\d{4}\/\d{1,2}\/\d{1,2}-\d{4}\/\d{1,2}\/\d{1,2}'))[0]
             transaction_date = dateparse(date_range.split('-')[1].split('(')[0]).date()
-            balance = '-' + d.select('#fixBand40 div font')[0].text.replace('￥', '').replace(',', '').strip()
+            balance = '-' + d.find(src="https://pbdw.ebank.cmbchina.com/"
+                                   "cbmresource/22/dyzd/jpkdyzd/xbgbdt/bqhkzz.jpg")\
+                .parent.parent.find_next_sibling(
+                'td').select('font')[0].text.replace('￥', '').replace(',', '').strip()
             txn_balance=data.Balance(
                 account=self.account_name,
                 amount=Amount(D(balance), 'CNY'),

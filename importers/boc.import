@@ -23,7 +23,8 @@ CONFIG = [
         },
         account='Assets:Bank:BOC:Card0000',
         currency='CNY',
-        regexps='网点名称'
-        # categorizer=guess.guess2]
+        regexps='网点名称',
+        csv_dialect='excel-tab'
+       # categorizer=guess.guess2]
     ), [DuplicateDetector(),PredictPostings()])
 ]
