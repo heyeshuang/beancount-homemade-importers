@@ -1,6 +1,7 @@
-"""Importer for 
+
+"""Importer for 招商银行 (China Merchants Bank)
 """
-__copyright__ = "Copyright (C) 2019  He Yeshuang"
+__copyright__ = "Copyright (C) 2019-2021  He Yeshuang"
 __license__ = "GNU GPLv2"
 
 import base64
@@ -29,7 +30,7 @@ class CmbEmlImporter(importer.ImporterProtocol):
 
     def __init__(self, account='Liabilities:CreditCards:CMB:Card'):
         # print(file_type)
-        self.account_name:str = account
+        self.account_name: str = account
         self.currency = "CNY"
         pass
 
@@ -51,26 +52,28 @@ class CmbEmlImporter(importer.ImporterProtocol):
         # Open the CSV file and create directives.
         entries = []
         index = 0
-        with open(file.name,'rb') as f:
+        with open(file.name, 'rb') as f:
             eml = parser.BytesParser().parse(fp=f)
-            b=base64.b64decode(eml.get_payload()[0].get_payload())
-            d = BeautifulSoup(b,"lxml")
-            date_range = d.findAll(text=re.compile('\d{4}\/\d{1,2}\/\d{1,2}-\d{4}\/\d{1,2}\/\d{1,2}'))[0]
-            transaction_date = dateparse(date_range.split('-')[1].split('(')[0]).date()
+            b = base64.b64decode(eml.get_payload()[0].get_payload())
+            d = BeautifulSoup(b, "lxml")
+            date_range = d.findAll(text=re.compile(
+                '\d{4}\/\d{1,2}\/\d{1,2}-\d{4}\/\d{1,2}\/\d{1,2}'))[0]
+            transaction_date = dateparse(
+                date_range.split('-')[1].split('(')[0]).date()
             balance = '-' + d.find(src="https://pbdw.ebank.cmbchina.com/"
                                    "cbmresource/22/dyzd/jpkdyzd/xbgbdt/bqhkzz.jpg")\
                 .parent.parent.find_next_sibling(
                 'td').select('font')[0].text.replace('￥', '').replace(',', '').strip()
-            txn_balance=data.Balance(
+            txn_balance = data.Balance(
                 account=self.account_name,
                 amount=Amount(D(balance), 'CNY'),
                 meta=data.new_metadata(".", 1000),
-                tolerance= None,
+                tolerance=None,
                 diff_amount=None,
                 date=transaction_date
             )
             entries.append(txn_balance)
-            
+
             bands = d.select('#fixBand29 #loopBand2>table>tr')
             for band in bands:
                 tds = band.select('td #fixBand15 table table td')
@@ -79,15 +82,21 @@ class CmbEmlImporter(importer.ImporterProtocol):
                 trade_date = tds[1].text.strip()
                 if trade_date == '':
                     trade_date = tds[2].text.strip()
-                date = datetime.strptime(trade_date,'%m%d').replace(year=transaction_date.year).date()
+                # date = datetime.strptime(trade_date,'%m%d').replace(year=transaction_date.year).date()
+                date = datetime.strptime(trade_date, '%m%d')
+                if date.month == 12 and transaction_date.month == 1:
+                    date = date.replace(year=transaction_date.year-1).date()
+                else:
+                    date = date.replace(year=transaction_date.year).date()
                 full_descriptions = tds[3].text.strip().split('-')
                 payee = full_descriptions[0]
                 narration = '-'.join(full_descriptions[1:])
                 real_currency = 'CNY'
-                real_price = tds[4].text.replace('￥', '').replace('\xa0', '').strip()
+                real_price = tds[4].text.replace(
+                    '￥', '').replace('\xa0', '').strip()
                 # print("Importing {} at {}".format(narration, date))
                 flag = "*"
-                amount =-Amount( D(real_price),real_currency)
+                amount = -Amount(D(real_price), real_currency)
                 meta = data.new_metadata(file.name, index)
                 txn = data.Transaction(
                     meta, date, self.FLAG, payee, narration, data.EMPTY_SET, data.EMPTY_SET, [
