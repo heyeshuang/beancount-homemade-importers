@@ -34,7 +34,7 @@ bean-extract importers/boc.import documents.tmp/test.csv -f 你的参考账本.b
 # 数据源：信用卡账单电子邮件
 # 需要在招行网银上将账单邮寄方式改为“电子邮件（含明细）”
 # 然后在邮件客户端上下载“招商银行信用卡电子账单xxx.eml”
-bean-extract importers/cmb.import documents.tmp/招商银行信用卡电子账单xxx.eml -f 你的参考账本.bean> test.bean
+bean-extract importers/cmb_eml.import documents.tmp/招商银行信用卡电子账单xxx.eml -f 你的参考账本.bean> test.bean
 
 ```
 
