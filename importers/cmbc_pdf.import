@@ -2,6 +2,7 @@
 
 import os
 import sys
+from beancount.core import account
 
 import beancount.ingest.extract
 
@@ -15,13 +16,16 @@ except ImportError:
 
 beancount.ingest.extract.HEADER = ''
 sys.path.append("./")
-from importers.cmb_eml import CmbEmlImporter
+from importers.cmbc_pdf import CmbcPDFImporter
+
+account = "Assets:Bank:CMBC:Card"
 
 if isSmart:
     CONFIG = [
-        apply_hooks(CmbEmlImporter(), [DuplicateDetector(), PredictPostings()])
+        apply_hooks(CmbcPDFImporter(account=account), [
+                    DuplicateDetector(), PredictPostings()])
     ]
 else:
     CONFIG = [
-        CmbEmlImporter()
+        CmbcPDFImporter(account=account)
     ]

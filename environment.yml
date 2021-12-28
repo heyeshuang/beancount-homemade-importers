@@ -1,0 +1,11 @@
+name: bc
+channels:
+  - defaults
+dependencies:
+  - python=3.9
+  - camelot-py
+  # - ipykernel
+  - pip:
+    - fava
+    - smart-importer
+    - beancount

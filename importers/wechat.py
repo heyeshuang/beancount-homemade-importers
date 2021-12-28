@@ -1,3 +1,5 @@
+# -*- coding: UTF-8 -*-
+
 """Importer for 微信
 """
 __copyright__ = "Copyright (C) 2019  He Yeshuang"
@@ -31,7 +33,7 @@ class WechatImporter(importer.ImporterProtocol):
     def identify(self, file):
         # Match if the filename is as downloaded and the header has the unique
         # fields combination we're looking for.
-        return (re.match(r"微信支付账单\(\d{8}-\d{8}\).csv", path.basename(file.name)))
+        return (re.search(r"微信支付账单", path.basename(file.name)))
 
     def file_name(self, file):
         return 'wechat.{}'.format(path.basename(file.name))
@@ -48,7 +50,7 @@ class WechatImporter(importer.ImporterProtocol):
         # Open the CSV file and create directives.
         entries = []
         index = 0
-        with open(file.name) as f:
+        with open(file.name, encoding="utf-8") as f:
             for _ in range(16):
                 next(f)
             for index, row in enumerate(csv.DictReader(f)):
