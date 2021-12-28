@@ -61,6 +61,12 @@ bean-extract importers/cmb_eml.import documents.tmp/招商银行信用卡电子�
 bean-extract importers/cmbc_pdf.import documents.tmp/pdf_mxXXXXXX.pdf -e 你的参考账本.bean> test.bean
 ```
 
+### 使用bean-file归档
+
+```bash
+bean-file -o documents importers/XXXX.import documents.tmp/XXXX 
+```
+
 ## 可能出现的问题
 
 - 在Windows的CMD下，通过`>`输出的文件编码可能有误，需要在运行命令前设置环境变量：
