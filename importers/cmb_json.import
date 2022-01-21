@@ -1,0 +1,30 @@
+#!/usr/bin/env python
+
+import os
+import sys
+
+import beancount.ingest.extract
+
+isSmart = True
+try:
+    from smart_importer import apply_hooks, PredictPostings
+    from smart_importer.detector import DuplicateDetector
+except ImportError:
+    isSmart = False
+
+
+beancount.ingest.extract.HEADER = ''
+sys.path.append("./")
+from importers.cmb_json import CmbJSONImporter
+
+account = 'Liabilities:CreditCards:CMB:Card'
+
+if isSmart:
+    CONFIG = [
+        apply_hooks(CmbJSONImporter(account=account), [
+                    DuplicateDetector(), PredictPostings()])
+    ]
+else:
+    CONFIG = [
+        CmbJSONImporter(account=account)
+    ]

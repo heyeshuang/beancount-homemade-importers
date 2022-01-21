@@ -47,10 +47,16 @@ bean-extract importers/boc.import documents.tmp/test.csv -e 你的参考账本.b
 ```
 ### 招商银行信用卡
 
-数据源为信用卡账单电子邮件。需要在招行网银上将账单邮寄方式改为“电子邮件（含明细）”，然后在邮件客户端上下载“招商银行信用卡电子账单xxx.eml”
+~~数据源为信用卡账单电子邮件。需要在招行网银上将账单邮寄方式改为“电子邮件（含明细）”，然后在邮件客户端上下载“招商银行信用卡电子账单xxx.eml”~~
+
+数据源为[招商银行信用卡中心](https://xyk.cmbchina.com/credit-express/bill)移动网页，需要保存这个网页与服务器之间`XMLHttpRequest`通信。我写了一篇[blog](https://blog.heysh.xyz/2022/01/21/new-method-to-get-cmb-bill/)来搞到这个。需要将通信内容保存为`.json`文件。
 
 ```bash
-bean-extract importers/cmb_eml.import documents.tmp/招商银行信用卡电子账单xxx.eml -e 你的参考账本.bean> test.bean
+## EML方法已无法使用
+# bean-extract importers/cmb_eml.import documents.tmp/招商银行信用卡电子账单xxx.eml -e 你的参考账本.bean> test.bean
+
+## JSON方法
+bean-extract importers/cmb_json.import documents.tmp/xxx.json -e 你的参考账本.bean > test.bean
 ```
 
 ### 民生银行借记卡
@@ -76,4 +82,4 @@ set PYTHONIOENCODING=utf-8:surrogateescape
 ```
 
 
-另外感谢[zsxsoft](https://github.com/zsxsoft/my-beancount-scripts)，不得不说，通过eml文件导入账单真是个好主意。
+另外感谢[zsxsoft](https://github.com/zsxsoft/my-beancount-scripts)，~~不得不说，通过eml文件导入账单真是个好主意。~~ 不再是了，当然还是要感谢。
