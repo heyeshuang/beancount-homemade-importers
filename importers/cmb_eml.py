@@ -1,24 +1,20 @@
 
 """Importer for 招商银行 (China Merchants Bank)
+Deprecated: Use importers/cmb_json.py instead.
 """
 __copyright__ = "Copyright (C) 2019-2021  He Yeshuang"
 __license__ = "GNU GPLv2"
 
 import base64
-import csv
 import datetime
-import logging
 import re
-import sys
 from email import parser
-from enum import Enum
 from os import path
-from typing import Dict
 from datetime import datetime
 
-from beancount.core import account, data, position
+from beancount.core import data
 from beancount.core.amount import Amount
-from beancount.core.number import ZERO, D
+from beancount.core.number import D
 from beancount.ingest import importer
 from bs4 import BeautifulSoup
 from dateutil.parser import parse as dateparse
@@ -60,10 +56,10 @@ class CmbEmlImporter(importer.ImporterProtocol):
                 '\d{4}\/\d{1,2}\/\d{1,2}-\d{4}\/\d{1,2}\/\d{1,2}'))[0]
             transaction_date = dateparse(
                 date_range.split('-')[1].split('(')[0]).date()
-            balance = '-' + d.find(src="https://pbdw.ebank.cmbchina.com/"
-                                   "cbmresource/22/dyzd/jpkdyzd/xbgbdt/bqhkzz.jpg")\
+            balance = '-' + d.find(src="https://s3gw.cmbimg.com/lm50_creditbill_prd/bill_templet_resource/"  # 不知道其他人是不是的hash是不是和我一样
+                                   "email_normal_gold_e_bank_20210603_43032c92498745fdbeef630eac905b38")\
                 .parent.parent.find_next_sibling(
-                'td').select('font')[0].text.replace('￥', '').replace(',', '').strip()
+                    'td').select('font')[0].text.replace('￥', '').replace('¥', '').replace(',', '').strip()
             txn_balance = data.Balance(
                 account=self.account_name,
                 amount=Amount(D(balance), 'CNY'),
@@ -74,6 +70,7 @@ class CmbEmlImporter(importer.ImporterProtocol):
             )
             entries.append(txn_balance)
 
+            # 现在不知道是什么jbmn,算了算了
             bands = d.select('#fixBand29 #loopBand2>table>tr')
             for band in bands:
                 tds = band.select('td #fixBand15 table table td')

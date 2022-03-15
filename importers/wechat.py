@@ -54,6 +54,9 @@ class WechatImporter(importer.ImporterProtocol):
             for _ in range(16):
                 next(f)
             for index, row in enumerate(csv.DictReader(f)):
+                if "转入零钱通" in row["交易类型"]:
+                    continue  # skip the transfer to wechat
+
                 meta = data.new_metadata(file.name, index)
                 date = parse(row['交易时间']).date()
                 raw_amount = D(row['金额(元)'].lstrip("¥"))
