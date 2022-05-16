@@ -1,9 +1,12 @@
 name: bc
 channels:
+  - anaconda
+  - conda-forge
   - defaults
 dependencies:
   - python=3.9
   - camelot-py
+  - pip
   # - ipykernel
   - pip:
     - fava

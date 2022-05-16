@@ -78,6 +78,7 @@ bean-file -o documents importers/XXXX.import documents.tmp/XXXX
 - 在Windows的CMD下，通过`>`输出的文件编码可能有误，需要在运行命令前设置环境变量：
 
 ```CMD
+set PYTHONUTF8=1
 set PYTHONIOENCODING=utf-8:surrogateescape
 ```
 
