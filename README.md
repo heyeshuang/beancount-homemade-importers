@@ -82,5 +82,6 @@ set PYTHONUTF8=1
 set PYTHONIOENCODING=utf-8:surrogateescape
 ```
 
+或者一劳永逸，在控制面版的“区域设置”中勾选“使用UTF-8提供全球语言支持”。See https://www.tutorialexample.com/set-windows-powershell-to-utf-8-encoding-to-fix-gbk-codec-can-not-encode-character-error-powershell-tutorial/
 
 另外感谢[zsxsoft](https://github.com/zsxsoft/my-beancount-scripts)，~~不得不说，通过eml文件导入账单真是个好主意。~~ 不再是了，当然还是要感谢。
