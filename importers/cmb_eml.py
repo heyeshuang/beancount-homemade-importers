@@ -1,6 +1,5 @@
 
 """Importer for 招商银行 (China Merchants Bank)
-Deprecated: Use importers/cmb_json.py instead.
 """
 __copyright__ = "Copyright (C) 2019-2021  He Yeshuang"
 __license__ = "GNU GPLv2"
@@ -8,7 +7,7 @@ __license__ = "GNU GPLv2"
 import base64
 import datetime
 import re
-from email import parser
+from email import parser, policy
 from os import path
 from datetime import datetime
 
@@ -49,8 +48,9 @@ class CmbEmlImporter(importer.ImporterProtocol):
         entries = []
         index = 0
         with open(file.name, 'rb') as f:
-            eml = parser.BytesParser().parse(fp=f)
-            b = base64.b64decode(eml.get_payload()[0].get_payload())
+            eml = parser.BytesParser(policy=policy.default).parse(fp=f)
+            # b = base64.b64decode(eml.get_payload()[0].get_payload())
+            b = eml.get_payload()[0].get_payload(decode=True).decode("UTF8")
             d = BeautifulSoup(b, "lxml")
             date_range = d.findAll(text=re.compile(
                 '\d{4}\/\d{1,2}\/\d{1,2}-\d{4}\/\d{1,2}\/\d{1,2}'))[0]
@@ -71,7 +71,7 @@ class CmbEmlImporter(importer.ImporterProtocol):
             entries.append(txn_balance)
 
             # 现在不知道是什么jbmn,算了算了
-            bands = d.select('#fixBand29 #loopBand2>table>tr')
+            bands = d.select('#fixBand29 #loopBand2>table>tbody>tr')
             for band in bands:
                 tds = band.select('td #fixBand15 table table td')
                 if len(tds) == 0:
@@ -90,7 +90,7 @@ class CmbEmlImporter(importer.ImporterProtocol):
                 narration = '-'.join(full_descriptions[1:])
                 real_currency = 'CNY'
                 real_price = tds[4].text.replace(
-                    '￥', '').replace('\xa0', '').strip()
+                    '￥', '').replace('\xa0', '').replace('¥', '').strip()
                 # print("Importing {} at {}".format(narration, date))
                 flag = "*"
                 amount = -Amount(D(real_price), real_currency)
