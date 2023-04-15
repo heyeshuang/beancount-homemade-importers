@@ -28,7 +28,7 @@ bean-extract importers/youqian/youqian_income.import documents.tmp/income.csv > 
 
 ## Other importers
 
-[smart_importer](https://github.com/beancount/smart_importer) needs to be installed to import smartly.
+[smart_importer](https://github.com/beancount/smart_importer) needs to be installed to import smartly.我还添加了jieba分词，对中文也许有作用。
 
 ### 微信
 
@@ -40,7 +40,7 @@ bean-extract importers/wechat.import documents.tmp/微信支付账单(xxxxxxxx-x
 
 ### 中国银行借记卡
 
-数据来源：中国银行网上银行（网页版），需要将UTF-16转换成UTF-8
+数据来源：中国银行网上银行（网页版）~~，需要将UTF-16转换成UTF-8~~，现在不需要了。`他们终于找到了按钮！`
 
 ```bash
 bean-extract importers/boc.import documents.tmp/test.csv -e 你的参考账本.bean> test.bean
@@ -54,7 +54,7 @@ bean-extract importers/boc.import documents.tmp/test.csv -e 你的参考账本.b
 
 ```bash
 ## EML方法
-# bean-extract importers/cmb_eml.import documents.tmp/招商银行信用卡电子账单xxx.eml -e 你的参考账本.bean> test.bean
+bean-extract importers/cmb_eml.import documents.tmp/招商银行信用卡电子账单xxx.eml -e 你的参考账本.bean> test.bean
 
 ## JSON方法
 bean-extract importers/cmb_json.import documents.tmp/xxx.json -e 你的参考账本.bean > test.bean
@@ -63,6 +63,8 @@ bean-extract importers/cmb_json.import documents.tmp/xxx.json -e 你的参考账
 ### 民生银行借记卡
 
 在手机网上银行上可以导出PDF格式的民生银行借记卡账单。通过`Camelot-py`读取PDF。
+
+>注意，这种方法是按照PDF的绝对位置取数值的，如果你有超大额支出的话请务必核对。我就没有这种烦恼啦~
 
 ```bash
 bean-extract importers/cmbc_pdf.import documents.tmp/pdf_mxXXXXXX.pdf -e 你的参考账本.bean> test.bean
@@ -85,4 +87,4 @@ set PYTHONIOENCODING=utf-8:surrogateescape
 
 或者一劳永逸，在控制面版的“区域设置”中勾选“使用UTF-8提供全球语言支持”。See https://www.tutorialexample.com/set-windows-powershell-to-utf-8-encoding-to-fix-gbk-codec-can-not-encode-character-error-powershell-tutorial/
 
-另外感谢[zsxsoft](https://github.com/zsxsoft/my-beancount-scripts)，~~不得不说，通过eml文件导入账单真是个好主意。~~ 不再是了，当然还是要感谢。
+另外感谢[zsxsoft](https://github.com/zsxsoft/my-beancount-scripts)，不得不说，通过eml文件导入账单真是个好主意。~~不再是了，当然还是要感谢。~~ 现在又是了~
