@@ -19,7 +19,7 @@ from beancount.core.amount import Amount
 from beancount.core.number import ZERO, D
 from beancount.ingest import importer
 from dateutil.parser import parse
-from smart_importer import PredictPostings, PredictPayees
+# from smart_importer import PredictPostings, PredictPayees
 
 class WechatImporter(importer.ImporterProtocol):
     """An importer for Wechat CSV files."""

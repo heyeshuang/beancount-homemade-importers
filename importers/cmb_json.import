@@ -9,6 +9,10 @@ isSmart = True
 try:
     from smart_importer import apply_hooks, PredictPostings
     from smart_importer.detector import DuplicateDetector
+    import jieba
+    jieba.initialize()
+    tokenizer = lambda s: list(jieba.cut(s))
+
 except ImportError:
     isSmart = False
 
@@ -22,7 +26,7 @@ account = 'Liabilities:CreditCards:CMB:Card'
 if isSmart:
     CONFIG = [
         apply_hooks(CmbJSONImporter(account=account), [
-                    DuplicateDetector(), PredictPostings()])
+                    DuplicateDetector(), PredictPostings(string_tokenizer=tokenizer)])
     ]
 else:
     CONFIG = [

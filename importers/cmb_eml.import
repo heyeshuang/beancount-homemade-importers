@@ -9,6 +9,9 @@ isSmart = True
 try:
     from smart_importer import apply_hooks, PredictPostings
     from smart_importer.detector import DuplicateDetector
+    import jieba
+    jieba.initialize()
+    def tokenizer(s): return list(jieba.cut(s))
 except ImportError:
     isSmart = False
 
@@ -19,7 +22,8 @@ from importers.cmb_eml import CmbEmlImporter
 
 if isSmart:
     CONFIG = [
-        apply_hooks(CmbEmlImporter(), [DuplicateDetector(), PredictPostings()])
+        apply_hooks(CmbEmlImporter(), [DuplicateDetector(
+        ), PredictPostings(string_tokenizer=tokenizer)])
     ]
 else:
     CONFIG = [

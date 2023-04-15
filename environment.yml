@@ -6,6 +6,7 @@ channels:
 dependencies:
   - python=3.9
   - camelot-py
+  - jieba
   - pip
   # - ipykernel
   - pip:
