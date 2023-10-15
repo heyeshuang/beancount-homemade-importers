@@ -39,7 +39,7 @@ class CmbcPDFImporter(importer.ImporterProtocol):
         # Match if the filename is as downloaded and the header has the unique
         # fields combination we're looking for.
         return (
-            re.search(r"pdf_mx", path.basename(file.name))
+            re.search(r"pdf", path.basename(file.name))
         )
 
     def file_name(self, file):
