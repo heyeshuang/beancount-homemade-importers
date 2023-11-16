@@ -21,7 +21,8 @@ CONFIG = [
             csv.Col.NARRATION1: '对方账户名称',
             # csv.Col.NARRATION2: '附言',
             csv.Col.AMOUNT_DEBIT: '支出金额',
-            csv.Col.AMOUNT_CREDIT: '收入金额'
+            csv.Col.AMOUNT_CREDIT: '收入金额',
+            csv.Col.BALANCE: '余额'
         
         },
         account='Assets:Bank:BOC:Card0000',
