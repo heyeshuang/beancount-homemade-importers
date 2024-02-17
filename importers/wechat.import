@@ -22,6 +22,7 @@ beancount.ingest.extract.HEADER = ''
 sys.path.append("./")
 from importers.wechat import WechatImporter
 # from importers.wechat import SmartWechatImporter
+ignore = ["招商银行"]
 
 accountDict = {
     "中国银行": "Assets:Bank:BOC:Card0000",
@@ -33,13 +34,15 @@ accountDict = {
 if isSmart:
     CONFIG = [
         # WechatImporter(accountDict=accountDict)
-        apply_hooks(WechatImporter(accountDict=accountDict),
-                    [DuplicateDetector(), PredictPostings(string_tokenizer=tokenizer)])
+        apply_hooks(
+            WechatImporter(accountDict=accountDict, ignore=ignore),
+            [DuplicateDetector(), PredictPostings(string_tokenizer=tokenizer)],
+        )
         # SmartWechatImporter(accountDict=accountDict)
     ]
 else:
     CONFIG = [
-        WechatImporter(accountDict=accountDict)
+        WechatImporter(accountDict=accountDict, ignore=ignore)
         # apply_hooks(WechatImporter(accountDict=accountDict), [PredictPostings()])
         # SmartWechatImporter(accountDict=accountDict)
     ]

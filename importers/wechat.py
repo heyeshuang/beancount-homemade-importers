@@ -2,7 +2,7 @@
 
 """Importer for 微信
 """
-__copyright__ = "Copyright (C) 2019  He Yeshuang"
+__copyright__ = "Copyright (C) 2024  He Yeshuang"
 __license__ = "GNU GPLv2"
 
 import csv
@@ -24,9 +24,10 @@ from dateutil.parser import parse
 class WechatImporter(importer.ImporterProtocol):
     """An importer for Wechat CSV files."""
 
-    def __init__(self, accountDict: Dict):
+    def __init__(self, ignore: list, accountDict: Dict):
         # print(file_type)
         self.accountDict = accountDict
+        self.ignore = ignore
         self.currency = "CNY"
         pass
 
@@ -80,7 +81,8 @@ class WechatImporter(importer.ImporterProtocol):
                                      None, None, None, None),
                     ])
 
-                entries.append(txn)
+                if not any(i in account_1_text for i in self.ignore):
+                    entries.append(txn)
 
         # Insert a final balance check.
 
