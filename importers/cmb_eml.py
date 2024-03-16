@@ -80,7 +80,9 @@ class CmbEmlImporter(importer.ImporterProtocol):
                 if trade_date == '':
                     trade_date = tds[2].text.strip()
                 # date = datetime.strptime(trade_date,'%m%d').replace(year=transaction_date.year).date()
-                date = datetime.strptime(trade_date, '%m%d')
+                date = datetime.strptime(
+                    str(transaction_date.year) + trade_date, "%Y%m%d"
+                )
                 if date.day < 15 and date.month != transaction_date.month:
                     date = date.replace(day=15) #防止之前的balance出现错误
                 if date.month == 12 and transaction_date.month == 1:
