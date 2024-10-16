@@ -69,6 +69,14 @@ bean-extract importers/cmb_json.import documents.tmp/xxx.json -e 你的参考账
 ```bash
 bean-extract importers/cmbc_pdf.import documents.tmp/pdf_mxXXXXXX.pdf -e 你的参考账本.bean> test.bean
 ```
+### 招商银行借记卡
+
+在民生的基础上改的。
+
+```bash
+bean-extract importers/cmb_debit_pdf.import documents.tmp/招商银行交易流水\(申请时间xxxx年xx月xx日xx时xx分xx秒\).pdf -e template.bean  > test.bean
+```
+
 
 ### 使用bean-file归档
 

@@ -1,7 +1,7 @@
-
-"""Importer for 招商银行 (China Merchants Bank)
+"""Importer for 民生银行借记卡账单pdf
 """
-__copyright__ = "Copyright (C) 2019-2021  He Yeshuang"
+
+__copyright__ = "Copyright (C) 2019-2024  He Yeshuang"
 __license__ = "GNU GPLv2"
 
 import base64
@@ -38,9 +38,7 @@ class CmbcPDFImporter(importer.ImporterProtocol):
     def identify(self, file):
         # Match if the filename is as downloaded and the header has the unique
         # fields combination we're looking for.
-        return (
-            re.search(r"pdf", path.basename(file.name))
-        )
+        return re.search(r"\d{19}\.pdf", path.basename(file.name))
 
     def file_name(self, file):
         return 'cmbc.{}'.format(path.basename(file.name))
