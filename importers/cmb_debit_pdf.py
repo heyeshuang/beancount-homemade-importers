@@ -80,7 +80,7 @@ class CmbPDFImporter(importer.ImporterProtocol):
             )
         dfa = all_data
         dfa.replace(to_replace="\n", value="", regex=True, inplace=True)
-        dfa["记账日期"] = pd.to_datetime(dfa["记账日期"]).dt.date
+        dfa["记账日期"] = pd.to_datetime(dfa["记账日期"], errors='coerce').dt.date
         dfa = dfa[~dfa["记账日期"].isna()]  #防止因为列太高产生空行
         # print(dfa)
         entries = [
