@@ -56,8 +56,8 @@ class CmbEmlImporter(importer.ImporterProtocol):
                 '\d{4}\/\d{1,2}\/\d{1,2}-\d{4}\/\d{1,2}\/\d{1,2}'))[0]
             transaction_date = dateparse(
                 date_range.split('-')[1].split('(')[0]).date()
-            balance = '-' + d.find(src="https://s3gw.cmbimg.com/lm50_creditbill_prd/bill_templet_resource/"  # 不知道其他人是不是的hash是不是和我一样
-                                   "email_normal_gold_e_bank_20210603_43032c92498745fdbeef630eac905b38")\
+            balance = '-' + d.find(src="https://s3gw.cmbimg.com/ll65st0201-emaildmz-prd-1255000089/bill_templet_resource/"  # 不知道其他人是不是的hash是不是和我一样
+                                   "email_normal_gold_e_bank_20230112_fb52414c35bf4cf085fec05e40360621")\ #2025年修改
                 .parent.parent.find_next_sibling(
                     'td').select('font')[0].text.replace('￥', '').replace('¥', '').replace(',', '').strip()
             txn_balance = data.Balance(
