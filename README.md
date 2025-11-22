@@ -1,98 +1,60 @@
-<http://blog.heysh.xyz/2019/11/07/netease-youqian-with-beancount/>
+花了一点时间，把本人现在仍然在使用的importers升级成beancount v3 (beangulp) 版本了。
 
 ## 环境设置
 
-建议使用[Anaconda](https://mirrors.tuna.tsinghua.edu.cn/help/anaconda/)
-来进行环境管理。我之前用的Poetry在Windows下配置出现了一些小问题。
+建议使用Pixi来进行环境管理，不过不管理也没什么问题。自行按照pixi.toml安装依赖也可以。
 
+使用之前记得在源文件里修改账户名称。
+
+## 微信导入
+
+数据来源：`服务-钱包-账单-右上角-下载账单-用作个人对账`，因为我没搞定，请手动把xlsx文件转成csv。
+
+把转换好的文件放在`documents.tmp/微信支付账单(xxxxxxxx-xxxxxxxx).csv`。
 ```bash
-conda env create -f environment.yml
-conda activate bc
-```
-当然也可以直接按照`environment.yml`安装需要的Packages。
-
-## Auto initialize some income/expense accounts for Beancount
-
-```bash
-python importers/youqian/accountInit.py > New_Accounts.bean
-# 如果已经建立了一部分账户
-python importers/youqian/accountInit.py Existing_Accounts.bean > New_Accounts.bean
-```
-
-## Import Netease Youqian（网易有钱）
-
-```
-bean-extract importers/youqian/youqian_expense.import documents.tmp/expense.csv > expense.bean
-bean-extract importers/youqian/youqian_income.import documents.tmp/income.csv > income.bean
-```
-
-## Other importers
-
-[smart_importer](https://github.com/beancount/smart_importer) needs to be installed to import smartly.我还添加了jieba分词，对中文也许有作用。
-
-### 微信
-
-数据来源：`支付-钱包-账单-常见问题-下载账单-用作个人对账`
-
-```bash
-bean-extract importers/wechat.import documents.tmp/微信支付账单(xxxxxxxx-xxxxxxxx).csv -e 你的参考账本.bean> test.bean 
+# 导入
+python importers/wechat.py extract documents.tmp/微信支付账单*.csv -e template.bean > temp_wx.bean
+# 归档
+python importers/wechat.py archive  documents.tmp -o documents
 ```
 
 ### 中国银行借记卡
 
-数据来源：中国银行网上银行（网页版）~~，需要将UTF-16转换成UTF-8~~，现在不需要了。`他们终于找到了按钮！`
+数据来源：中国银行网上银行（网页版）。
 
 ```bash
-bean-extract importers/boc.import documents.tmp/test.csv -e 你的参考账本.bean> test.bean
+# 导入
+python importers/boc.py extract documents.tmp/AccountTransDetail* -e template.bean >temp_boc.bean
+# 归档
+python importers/boc.py archive  documents.tmp -o documents
 ```
 ### 招商银行信用卡
 
-1. `cmb_eml.import`数据源为信用卡账单电子邮件。需要在招行网银上将账单邮寄方式改为“电子邮件（含明细）”，然后在邮件客户端上下载“招商银行信用卡电子账单xxx.eml”
+数据源为信用卡账单电子邮件。需要在招行网银上将账单邮寄方式改为“电子邮件（含明细）”，然后在邮件客户端上下载“招商银行信用卡电子账单xxx.eml”。
 
-2. `cmb_json.import`数据源为[招商银行信用卡中心](https://xyk.cmbchina.com/credit-express/bill)移动网页，需要保存这个网页与服务器之间`XMLHttpRequest`通信。我写了一篇[blog](https://blog.heysh.xyz/2022/01/21/new-method-to-get-cmb-bill/)来搞到这个。需要将通信内容保存为`.json`文件。
-要是一个不行的话可以试试另外一个。
+之前的JSON方法随着手机页面升级失效了，等下次邮件坏掉的时候我再想办法。
+
 
 ```bash
-## EML方法
-bean-extract importers/cmb_eml.import documents.tmp/招商银行信用卡电子账单xxx.eml -e 你的参考账本.bean> test.bean
-
-## JSON方法
-bean-extract importers/cmb_json.import documents.tmp/xxx.json -e 你的参考账本.bean > test.bean
+# 导入
+python importers/cmb_eml.py extract documents.tmp/招商银行信用卡* -e template.bean > temp_cmb.bean
+# 归档
+python importers/cmb_eml.py archive documents.tmp -o documents
 ```
 
 ### 民生银行借记卡
 
-在手机网上银行上可以导出PDF格式的民生银行借记卡账单。通过`Camelot-py`读取PDF。
+还没搞，欢迎PR。
 
->注意，这种方法是按照PDF的绝对位置取数值的，如果你有超大额支出的话请务必核对。我就没有这种烦恼啦~
-
-```bash
-bean-extract importers/cmbc_pdf.import documents.tmp/pdf_mxXXXXXX.pdf -e 你的参考账本.bean> test.bean
-```
 ### 招商银行借记卡
 
-在民生的基础上改的。
+在`手机招商银行-收支明细-右上角-打印流水`那里。
 
 ```bash
-bean-extract importers/cmb_debit_pdf.import documents.tmp/招商银行交易流水\(申请时间xxxx年xx月xx日xx时xx分xx秒\).pdf -e template.bean  > test.bean
+# 导入
+python importers/cmb_debit_pdf.py extract documents.tmp/招商银行交易流水* -e template.bean > temp_cmbd.bean
+# 归档
+python importers/cmb_debit_pdf.py archive  documents.tmp -o documents 
 ```
 
-
-### 使用bean-file归档
-
-```bash
-bean-file -o documents importers/XXXX.import documents.tmp/XXXX 
-```
-
-## 可能出现的问题
-
-- 在Windows的CMD下，通过`>`输出的文件编码可能有误，需要在运行命令前设置环境变量：
-
-```CMD
-set PYTHONUTF8=1
-set PYTHONIOENCODING=utf-8:surrogateescape
-```
-
-或者一劳永逸，在控制面版的“区域设置”中勾选“使用UTF-8提供全球语言支持”。See https://www.tutorialexample.com/set-windows-powershell-to-utf-8-encoding-to-fix-gbk-codec-can-not-encode-character-error-powershell-tutorial/
-
-另外感谢[zsxsoft](https://github.com/zsxsoft/my-beancount-scripts)，不得不说，通过eml文件导入账单真是个好主意。~~不再是了，当然还是要感谢。~~ 现在又是了~
+题外话，beancount v2到v3的升级没有我想象得复杂，那里报错点哪里就行，我甚至没vide——当然我也用不明白。

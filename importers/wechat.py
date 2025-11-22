@@ -2,26 +2,48 @@
 
 """Importer for 微信
 """
-__copyright__ = "Copyright (C) 2024  He Yeshuang"
+__copyright__ = "Copyright (C) 2026  He Yeshuang"
 __license__ = "GNU GPLv2"
 
 import csv
 import datetime
-import logging
 import re
-import sys
 from enum import Enum
 from os import path
 from typing import Dict
 
-from beancount.core import account, data, position
+from beancount.core import  data, flags
 from beancount.core.amount import Amount
-from beancount.core.number import ZERO, D
-from beancount.ingest import importer
+from beancount.core.number import D
+import beangulp
 from dateutil.parser import parse
-# from smart_importer import PredictPostings, PredictPayees
 
-class WechatImporter(importer.ImporterProtocol):
+#############################################################
+# TODO: 修改此处账户名称                                     #
+#############################################################
+ignore = ["招商银行"]
+
+accountDict = {
+    "中国银行": "Assets:Bank:BOC:Card",
+    "招商银行": "Liabilities:CreditCards:CMB:Card",
+    "零钱": "Assets:WeChat:Wallet",
+    "工商银行": "Assets:Bank:ICBC:Card",
+    "/": "Assets:WeChat:Wallet"
+}
+
+#############################################################
+
+isSmart = True
+try:
+    from smart_importer import PredictPostings
+    import jieba
+    jieba.initialize()
+    tokenizer = lambda s: list(jieba.cut(s))
+
+except ImportError:
+    isSmart = False
+
+class WechatImporter(beangulp.Importer):
     """An importer for Wechat CSV files."""
 
     def __init__(self, ignore: list, accountDict: Dict):
@@ -31,34 +53,37 @@ class WechatImporter(importer.ImporterProtocol):
         self.currency = "CNY"
         pass
 
-    def identify(self, file):
+    def account(self, filepath):
+        return self.accountDict.get("/")
+
+    def identify(self, filepath):
         # Match if the filename is as downloaded and the header has the unique
         # fields combination we're looking for.
-        return (re.search(r"微信支付账单", path.basename(file.name)))
+        return (re.search(r"微信支付账单", path.basename(filepath)))
 
-    def file_name(self, file):
-        return 'wechat.{}'.format(path.basename(file.name))
+    def filename(self, filepath):
+        return 'wechat.{}'.format(path.basename(filepath))
 
     def file_account(self, _):
         return "Assets:WeChat:Wallet"
 
-    def file_date(self, file):
-        # Extract the statement date from the filename.
-        return datetime.datetime.strptime(path.basename(file.name).split("-")[-1],
-                                          '%Y%m%d).csv').date()
+    # def date(self, filepath):
+    #     # Extract the statement date from the filename.
+    #     return datetime.datetime.strptime(path.basename(filepath).split("-")[-1],
+    #                                       '%Y%m%d).csv').date()
 
-    def extract(self, file, existing_entries=None):
+    def extract(self, filepath, existing_entries=None):
         # Open the CSV file and create directives.
         entries = []
         index = 0
-        with open(file.name, encoding="utf-8") as f:
+        with open(filepath, encoding="utf-8") as f:
             for _ in range(16):
                 next(f)
             for index, row in enumerate(csv.DictReader(f)):
                 if "转入零钱通" in row["交易类型"]:
                     continue  # skip the transfer to wechat
 
-                meta = data.new_metadata(file.name, index)
+                meta = data.new_metadata(filepath, index)
                 date = parse(row['交易时间']).date()
                 raw_amount = D(row['金额(元)'].lstrip("¥"))
                 isExpense = True if (row['收/支'] == '支出' or row['收/支'] == '/') else False
@@ -76,7 +101,7 @@ class WechatImporter(importer.ImporterProtocol):
                         account_1 = asset_v
 
                 txn = data.Transaction(
-                    meta, date, self.FLAG, payee, narration, data.EMPTY_SET, data.EMPTY_SET, [
+                    meta, date, flags.FLAG_OKAY, payee, narration, data.EMPTY_SET, data.EMPTY_SET, [
                         data.Posting(account_1, amount,
                                      None, None, None, None),
                     ])
@@ -88,8 +113,15 @@ class WechatImporter(importer.ImporterProtocol):
 
         return entries
 
+IMPORTERS = [
+        WechatImporter(accountDict=accountDict, ignore=ignore)
+        # apply_hooks(WechatImporter(accountDict=accountDict), [PredictPostings()])
+        # SmartWechatImporter(accountDict=accountDict)
+]
+HOOKS = []
+if isSmart:
+            HOOKS= [PredictPostings(string_tokenizer=tokenizer).hook]
 
-# @PredictPostings()
-# @PredictPayees()
-# class SmartWechatImporter(WechatImporter):
-#     pass
+if __name__ == "__main__":
+    ingest = beangulp.Ingest(IMPORTERS, HOOKS)
+    ingest()

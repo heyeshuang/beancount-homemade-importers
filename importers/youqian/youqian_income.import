@@ -1,4 +1,0 @@
-import sys
-sys.path.append("./importers")
-from youqian.youqian import *
-CONFIG=[YouqianImporter(file_type=fileType.INCOME)]
