@@ -1,3 +1,6 @@
+>2025-11-22: **最近把一部分正在用的importers升级至beancount v3（beangulp）了，见`v3`分支** 
+
+
 <http://blog.heysh.xyz/2019/11/07/netease-youqian-with-beancount/>
 
 ## 环境设置
